@@ -136,8 +136,8 @@ namespace OpenRA.Orders
 			if (mi.Button != Game.Settings.Game.MouseButtonPreference.Action)
 				return null;
 
-			if (self.Owner != self.World.LocalPlayer)
-				return null;
+/* 			if (self.Owner != self.World.LocalPlayer)
+				return null; */
 
 			if (self.World.IsGameOver)
 				return null;
