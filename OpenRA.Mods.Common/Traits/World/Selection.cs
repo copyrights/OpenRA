@@ -178,7 +178,7 @@ namespace OpenRA.Mods.Common.Traits
 			foreach (var cg in controlGroups.Values)
 			{
 				// note: NOT `!a.IsInWorld`, since that would remove things that are in transports.
-				cg.RemoveAll(a => a.Disposed || a.Owner != world.LocalPlayer);
+				cg.RemoveAll(a => a.Disposed || (a.Owner != world.LocalPlayer && !a.Owner.IsAlliedWith(world.RenderPlayer)));
 			}
 		}
 
@@ -198,7 +198,7 @@ namespace OpenRA.Mods.Common.Traits
 				for (var i = 0; i < 10; i++) // all control groups
 					controlGroups[i].RemoveAll(a => actors.Contains(a));
 
-				controlGroups[group].AddRange(actors.Where(a => a.Owner == world.LocalPlayer));
+				controlGroups[group].AddRange(actors.Where(a => (a.Owner == world.LocalPlayer || a.Owner.IsAlliedWith(world.LocalPlayer))));
 				return;
 			}
 
