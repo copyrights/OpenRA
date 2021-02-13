@@ -167,6 +167,7 @@ namespace OpenRA.Mods.Common.Traits
 		void ITick.Tick(Actor self)
 		{
 			var removed = actors.RemoveWhere(a => !a.IsInWorld || (!a.Owner.IsAlliedWith(world.RenderPlayer) && world.FogObscures(a)));
+			var cmdAlliedUnits = self.World.WorldActor.Trait<TeamTogether>().CmdAlliedUnitsEnabled;
 			if (removed > 0)
 			{
 				UpdateHash();
@@ -178,7 +179,7 @@ namespace OpenRA.Mods.Common.Traits
 			foreach (var cg in controlGroups.Values)
 			{
 				// note: NOT `!a.IsInWorld`, since that would remove things that are in transports.
-				cg.RemoveAll(a => a.Disposed || (a.Owner != world.LocalPlayer && !a.Owner.IsAlliedWith(world.RenderPlayer)));
+				cg.RemoveAll(a => a.Disposed || (a.Owner != world.LocalPlayer && (!cmdAlliedUnits || !a.Owner.IsAlliedWith(world.RenderPlayer))));
 			}
 		}
 
@@ -187,6 +188,7 @@ namespace OpenRA.Mods.Common.Traits
 		public void DoControlGroup(World world, WorldRenderer worldRenderer, int group, Modifiers mods, int multiTapCount)
 		{
 			var addModifier = Platform.CurrentPlatform == PlatformType.OSX ? Modifiers.Meta : Modifiers.Ctrl;
+			var cmdAlliedUnits = world.WorldActor.Trait<TeamTogether>().CmdAlliedUnitsEnabled;
 			if (mods.HasModifier(addModifier))
 			{
 				if (actors.Count == 0)
@@ -198,7 +200,7 @@ namespace OpenRA.Mods.Common.Traits
 				for (var i = 0; i < 10; i++) // all control groups
 					controlGroups[i].RemoveAll(a => actors.Contains(a));
 
-				controlGroups[group].AddRange(actors.Where(a => (a.Owner == world.LocalPlayer || a.Owner.IsAlliedWith(world.LocalPlayer))));
+				controlGroups[group].AddRange(actors.Where(a => a.Owner == world.LocalPlayer || (cmdAlliedUnits && a.Owner.IsAlliedWith(world.LocalPlayer))));
 				return;
 			}
 

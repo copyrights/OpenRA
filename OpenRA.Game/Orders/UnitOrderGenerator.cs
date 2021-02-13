@@ -133,10 +133,11 @@ namespace OpenRA.Orders
 		/// </summary>
 		static UnitOrderResult OrderForUnit(Actor self, Target target, List<Actor> actorsAt, CPos xy, MouseInput mi)
 		{
+			var cmdAlliedUnits = self.World.OrderManager.LobbyInfo.GlobalSettings.OptionOrDefault("cmdalliedunits", false);
 			if (mi.Button != Game.Settings.Game.MouseButtonPreference.Action)
 				return null;
 
-			if (self.Owner != self.World.LocalPlayer && !self.Owner.IsAlliedWith(self.World.LocalPlayer))
+			if (self.Owner != self.World.LocalPlayer && (!cmdAlliedUnits || !self.Owner.IsAlliedWith(self.World.LocalPlayer)))
 				return null;
 
 			if (self.World.IsGameOver)
