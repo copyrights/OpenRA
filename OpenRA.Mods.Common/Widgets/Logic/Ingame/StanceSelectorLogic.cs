@@ -56,11 +56,12 @@ namespace OpenRA.Mods.Common.Widgets
 
 		void UpdateStateIfNecessary()
 		{
+			var cmdAlliedUnits = world.WorldActor.Trait<TeamTogether>().CmdAlliedUnitsEnabled;
 			if (selectionHash == world.Selection.Hash)
 				return;
 
 			actorStances = world.Selection.Actors
-				.Where(a => a.Owner == world.LocalPlayer && a.IsInWorld)
+				.Where(a => (a.Owner == world.LocalPlayer || (cmdAlliedUnits && a.Owner.IsAlliedWith(world.LocalPlayer))) && a.IsInWorld)
 				.SelectMany(a => a.TraitsImplementing<AutoTarget>()
 					.Where(at => at.Info.EnableStances)
 					.Select(at => new TraitPair<AutoTarget>(a, at)))
